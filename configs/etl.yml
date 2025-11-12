@@ -1,0 +1,48 @@
+# ETL配置文件
+source_excel: data/raw/AAD_multi_center.xlsx
+sheets: [CenterA, CenterB, CenterC, CenterD]
+pid_key: pid
+center_map:
+  CenterA: C1
+  CenterB: C2
+  CenterC: C3
+  CenterD: C4
+
+excel_date_fields:
+  - surg__start_dt_raw
+  - surg__end_dt_raw
+
+binary_map:
+  "√": 1
+  "×": 0
+  "0": 0
+  "": null
+
+unit_rules:
+  lab__Cr_*:
+    from: mg/dL
+    to: umol/L
+    factor: 88.4
+  lab__TBil_*:
+    from: mg/dL
+    to: umol/L
+    factor: 17.1
+
+value_ranges:
+  lab__Cr_*: [20, 1500]
+  lab__ALT_*: [0, 1000]
+  lab__AST_*: [0, 1000]
+  lab__TBil_*: [0, 500]
+  cpb__time_min: [0, 600]
+  cpb__crossclamp_min: [0, 300]
+  cpb__nadir_temp_c: [15, 40]
+  demo__age_yr: [18, 100]
+
+blacklist_features:
+  - lab__*_d1
+  - lab__*_d2
+  - lab__*_d3
+  - lab__*_peak
+  - lab__*_low
+
+output_dir: data/artifacts

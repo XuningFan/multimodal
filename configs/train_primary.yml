@@ -1,0 +1,100 @@
+# 主问题训练配置
+
+seed: 2025
+target_column: outcome__death30
+
+# 交叉验证配置
+cv:
+  type: stratified_kfold
+  n_splits: 5
+  random_state: 42
+
+# LOCO配置
+loco:
+  enable: true
+  center_field: center_id
+
+# 视图配置
+features_view: Primary_set_img
+
+# 模型配置
+models:
+  clinical_only:
+    type: lightgbm
+    params:
+      num_leaves: 31
+      learning_rate: 0.05
+      n_estimators: 200
+      class_weight: balanced
+      random_state: 42
+    calibration: platt
+
+  fusion_early:
+    type: early
+    img_backbone: resnet18
+    embed_dim: 256
+    tabular_layers: [128, 64]
+    dropout: 0.2
+    training:
+      optimizer: adam
+      learning_rate: 0.0001
+      weight_decay: 0.0001
+      batch_size: 8
+      max_epochs: 100
+      patience: 20
+      scheduler: plateau
+
+  fusion_intermediate:
+    type: intermediate
+    cross_attention_layers: 2
+    num_heads: 8
+    embed_dim: 256
+    dropout: 0.2
+    training:
+      optimizer: adamw
+      learning_rate: 0.0001
+      weight_decay: 0.0001
+      batch_size: 8
+      max_epochs: 100
+      patience: 20
+
+  fusion_late:
+    type: late
+    stacking_method: logistic
+    ensemble_method: weighted
+
+# 特征工程配置
+features:
+  t0_domains:
+    - demo__
+    - mhx__
+    - surg__
+    - cpb__
+    - perf__
+    - transfusion__
+    - lab__preop
+  scaler:
+    type: robust
+  derived_features: true
+
+# 影像特征配置
+image_features:
+  backbone: resnet18
+  embed_dim: 256
+  pretrained: true
+  batch_size: 8
+
+# 训练配置
+training:
+  output_dir: results
+  save_models: true
+  generate_plots: true
+  bootstrap:
+    n_samples: 1000
+    ci_level: 0.95
+
+# 硬件配置
+hardware:
+  gpu: "RTX 4090"
+  memory: "24GB"
+  mixed_precision: true

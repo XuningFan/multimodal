@@ -1,0 +1,57 @@
+# AKI次问题训练配置
+
+# 继承主配置，覆盖部分参数
+_parent: train_primary.yml
+
+# 目标配置
+target_column: outcome__aki
+features_view: Secondary_aki
+
+# 次问题特定配置
+secondary_task:
+  name: "AKI预测"
+  outcome_definition: "KDIGO标准"
+  time_window: "术后72小时内"
+
+# 模型配置（简化）
+models:
+  clinical_only:
+    type: lightgbm
+    params:
+      num_leaves: 31
+      learning_rate: 0.05
+      n_estimators: 200
+      class_weight: balanced
+      random_state: 42
+
+  fusion_early:
+    type: early
+    img_backbone: resnet18
+    embed_dim: 256
+    tabular_layers: [64, 32]
+    dropout: 0.3
+
+# 特征配置
+features:
+  t0_domains:
+    - demo__
+    - mhx__
+    - surg__
+    - cpb__
+    - lab__preop
+    # AKI相关的术前特征
+    - lab__Cr__preop
+    - mh__ckd
+    - mh__hypertension
+    - mh__diabetes
+
+# 类别平衡处理
+class_balance:
+  method: smote
+  sampling_strategy: auto
+
+# 评估配置
+evaluation:
+  primary_metric: auprc  # 对于不平衡数据更关注AUPRC
+  calibration_plot: true
+  decision_curve: true

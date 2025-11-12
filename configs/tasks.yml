@@ -1,0 +1,92 @@
+# 任务定义配置
+
+# 主问题任务
+primary:
+  name: "30天死亡预测"
+  target_column: outcome__death30
+  data_view: Primary_set_img
+  description: "预测Type A主动脉夹层患者术后30天死亡风险"
+  clinical_significance: "高风险患者识别和治疗决策支持"
+
+# 次问题任务
+secondary:
+  aki:
+    name: "急性肾损伤预测"
+    target_column: outcome__aki
+    data_view: Secondary_aki
+    definition: "KDIGO标准: 肌酐升高≥26.5μmol/L或≥1.5倍基线"
+    time_window: "术后72小时内"
+    clinical_significance: "肾功能监测和早期干预"
+
+  resp_fail:
+    name: "呼吸衰竭预测"
+    target_column: outcome__resp_fail
+    data_view: Secondary_resp
+    definition: "机械通气≥24小时或Berlin ARDS标准"
+    time_window: "术后7天内"
+    clinical_significance: "呼吸支持策略优化"
+
+  liver_injury:
+    name: "肝功能损伤预测"
+    target_column: outcome__liver_injury
+    data_view: Secondary_liver
+    definition: "ALT/AST>3倍正常上限或TBil≥3mg/dL"
+    time_window: "术后7天内"
+    clinical_significance: "肝功能保护和药物调整"
+
+  major_bleed:
+    name: "大出血预测"
+    target_column: outcome__major_bleed
+    data_view: Secondary_bleed
+    definition: "UDPB>1000mL或需要再开胸止血"
+    time_window: "术后24小时内"
+    clinical_significance: "出血预防和凝血管理"
+
+  stroke:
+    name: "脑卒中预测"
+    target_column: outcome__stroke
+    data_view: Secondary_stroke
+    definition: "术后新发神经系统缺陷，影像学证实"
+    time_window: "住院期间"
+    clinical_significance: "脑保护策略实施"
+
+# 复合终点
+composite_endpoints:
+  mae:
+    name: "主要不良事件"
+    components:
+      - outcome__death30
+      - outcome__stroke
+      - outcome__aki_severe
+      - outcome__major_bleed
+    definition: "任一复合成分发生"
+
+# 数据视图定义
+data_views:
+  Primary_set_all:
+    description: "全部患者，仅临床特征"
+    inclusion: "all_patients"
+    features: "clinical_only"
+
+  Primary_set_img:
+    description: "有CTA影像的患者，临床+影像特征"
+    inclusion: "imaging_available"
+    features: "multimodal"
+
+  Secondary_*:
+    description: "特定器官并发症的患者子集"
+    inclusion: "specific_outcome"
+    features: "multimodal"
+
+# 实验设计
+experimental_design:
+  ablation_matrix:
+    - "modality: [clinical_only, imaging_only, multimodal]"
+    - "fusion_type: [early, intermediate, late]"
+    - "feature_selection: [all, important, reduced]"
+
+  robustness_tests:
+    - "cross_center_generalization"
+    - "feature_corruption"
+    - "sample_size_variation"
+    - "temporal_validation"

@@ -1,4 +1,4 @@
-# multimodal - Spec-Kit for Aortic Dissection Analysis
+# SaNa - Spec-Kit for Aortic Dissection Analysis
 
 A型主动脉夹层多中心队列研究：基于规格驱动的AI模型预测系统
 
@@ -249,5 +249,10 @@ mypy etl/
 - 邮箱: [email]
 - 项目主页: [GitHub链接]
 
+## 致谢
+
+感谢所有参与多中心数据收集的医疗机构和研究人员。
 
 ---
+
+**注意**: 本项目仅用于研究目的，不应直接用于临床决策。临床使用前需要额外的验证和监管批准。
